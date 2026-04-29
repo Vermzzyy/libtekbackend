@@ -31,20 +31,32 @@ public class ReservationService {
 
     public ReservationEntity createReservation(ReservationEntity reservation) {
 
-        // Fix: correct getter name = getUser_id()
+        // ✅ Attach User
         if (reservation.getUser() != null) {
             Integer userId = reservation.getUser().getUserId();
             UserEntity user = userRepo.findById(userId).orElse(null);
             reservation.setUser(user);
         }
 
-        // Fix: correct getter name = getBoothId()
+        // 🔥 LIMIT: max 3 active reservations
+        UserEntity user = reservation.getUser();
+        if (user != null) {
+            int activeReservations = resrepo
+                    .countByUserUserIdAndStatus(user.getUserId(), "upcoming");
+
+            if (activeReservations >= 3) {
+                throw new RuntimeException("Maximum of 3 active reservations reached.");
+            }
+        }
+
+        // ✅ Attach Booth
         if (reservation.getBooth() != null) {
             Integer boothId = reservation.getBooth().getBoothId();
             BoothEntity booth = boothRepo.findById(boothId).orElse(null);
             reservation.setBooth(booth);
         }
 
+        // ✅ Default status
         reservation.setStatus("upcoming");
 
         return resrepo.save(reservation);
@@ -56,9 +68,9 @@ public class ReservationService {
 
     public ReservationEntity updateReservation(int reservation_id, ReservationEntity newReservation) {
         ReservationEntity reservation = resrepo.findById(reservation_id)
-                .orElseThrow(() -> new NoSuchElementException("Reservation " + reservation_id + " does not exist"));
+                .orElseThrow(() -> new NoSuchElementException(
+                        "Reservation " + reservation_id + " does not exist"));
 
-        // Fix: correct setter names
         reservation.setReservationDate(newReservation.getReservationDate());
         reservation.setReservationTime(newReservation.getReservationTime());
         reservation.setDuration(newReservation.getDuration());
@@ -68,7 +80,8 @@ public class ReservationService {
 
     public String cancelReservation(int reservation_id) {
         ReservationEntity reservation = resrepo.findById(reservation_id)
-                .orElseThrow(() -> new NoSuchElementException("Reservation " + reservation_id + " does not exist."));
+                .orElseThrow(() -> new NoSuchElementException(
+                        "Reservation " + reservation_id + " does not exist."));
 
         reservation.setStatus("cancelled");
         resrepo.save(reservation);

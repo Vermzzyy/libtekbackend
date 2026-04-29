@@ -8,4 +8,6 @@ import com.appdevg6.miamiheat.entity.ReservationEntity;
 @Repository
 public interface ReservationRepository extends JpaRepository<ReservationEntity, Integer> {
 
+    int countByUserUserIdAndStatus(Integer userId, String status);
+
 }
