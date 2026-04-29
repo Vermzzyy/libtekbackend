@@ -3,7 +3,7 @@ package com.appdevg6.miamiheat.entity;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "user")
+@Table(name = "users")
 public class UserEntity {
 
     @Id
