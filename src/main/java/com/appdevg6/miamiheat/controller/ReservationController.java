@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,12 +27,8 @@ public class ReservationController {
     ReservationService reservationService;
 
     @PostMapping("/newReservation")
-    public ResponseEntity<?> newReservation(@RequestBody ReservationEntity reservation) {
-        try {
-            return ResponseEntity.ok(reservationService.createReservation(reservation));
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    public ReservationEntity newReservation(@RequestBody ReservationEntity reservation) {
+        return reservationService.createReservation(reservation);
     }
 
     @GetMapping("/getAllReservations")
